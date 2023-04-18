@@ -1,0 +1,42 @@
+---
+  - name: CICD deployment Script
+    hosts: all
+    vars:
+      token: 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
+      username: FazilShaik1707
+      repo_name: Winzeal----Maven-Source
+    tasks: 
+      - name: Cloning the code from git
+        git:
+          repo: https://{{token}}@github.com/{{username}}/{{repo_name}}.git
+          dest: /tmp/project/
+
+      - name: Installing the maven 
+        become: yes
+        shell: | 
+          sudo apt install maven -y 
+      - name: check the version 
+        shell: | 
+          mvn --version 
+        register: data
+
+      - name: Build the Project 
+        shell: |
+          cd /tmp/project/
+          mvn clean package 
+      - name: installing the tomcat
+        become: yes 
+        unarchive:
+          src: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.74/bin/apache-tomcat-9.0.74.tar.gz
+          dest: /tmp/
+          remote_src: yes
+        ignore_errors: True
+
+      - name: renaming the tomcat folder
+        become: yes
+        shell: |
+          mv /tmp/apache-tomcat-9.0.74 /tmp/tomcat
+          chmod -R 777 /tmp/tomcat
+          chown -R ansadmin:ansadmin /tmp/tomcat
+          cp /tmp/project/target/*.war /tmp/tomcat/webapps/
+          sh /tmp/tomcat/bin/startup.sh

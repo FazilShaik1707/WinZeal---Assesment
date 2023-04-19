@@ -1,0 +1,11 @@
+---
+  - name: winzeal2
+    hosts: all
+    become: yes
+
+    tasks: 
+
+      - name: Look for the "nginx" process
+        shell: ps -ef |  grep nginx | grep -v grep
+        register: process_list
+        changed_when: false

@@ -1,0 +1,20 @@
+---
+  - name: winzeal
+    hosts: all
+    become: yes
+
+    tasks:
+      - name: Installing the nginx service
+        apt:
+          name: nginx
+          state: present
+
+      - name: process check
+        service:
+          name: nginx
+          state: started
+        register: data
+
+      - name: printing the nginx status
+        debug:
+          var: data
